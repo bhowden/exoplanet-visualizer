@@ -1,6 +1,3 @@
-Sure! Here's a basic `README.md` template for your Exoplanet Visualizer project:
-
-```markdown
 # Exoplanet Visualizer
 
 The Exoplanet Visualizer is a web application that allows you to visualize the position of an exoplanet in 3D space. It uses Three.js, a popular JavaScript library for 3D graphics, to create an interactive representation of the exoplanet's location and relevant data.
