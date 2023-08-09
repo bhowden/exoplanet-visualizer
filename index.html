@@ -1,0 +1,101 @@
+<html>
+   <head>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/110/three.min.js"></script>
+   </head>
+   <body>
+      <div id="scene-container"></div>
+      <script>
+         // Function to parse query parameters
+         const parseQueryParams = () => {
+             const queryParams = new URLSearchParams(window.location.search);
+             const exoplanet = {
+                 name: queryParams.get("name") || "Kepler-22b",
+                 distance: parseFloat(queryParams.get("distance")) || 100.0,
+                 ra: parseFloat(queryParams.get("ra")) || 135.0
+             };
+             return exoplanet;
+         };
+         
+         // Get exoplanet data from query parameters
+         const exoplanet = parseQueryParams();
+         
+         // Create a scene, camera, and renderer
+         const scene = new THREE.Scene();
+         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+         const renderer = new THREE.WebGLRenderer();
+         renderer.setSize(window.innerWidth, window.innerHeight);
+         document.getElementById('scene-container').appendChild(renderer.domElement);
+         
+         // Ensure the renderer uses the correct aspect ratio
+         window.addEventListener('resize', () => {
+             const newAspect = window.innerWidth / window.innerHeight;
+             camera.aspect = newAspect;
+             camera.updateProjectionMatrix();
+             renderer.setSize(window.innerWidth, window.innerHeight);
+         });
+         
+         // Create a globe geometry and material
+         const globeGeometry = new THREE.SphereGeometry(1, 128, 128); // Increase segments for smoother globe
+         const globeMaterial = new THREE.MeshBasicMaterial({ color: 0x0000ff }); // Blue color
+         const globe = new THREE.Mesh(globeGeometry, globeMaterial);
+         scene.add(globe);
+         
+         // Calculate Cartesian coordinates based on RA and distance (simplified)
+         const raRadians = exoplanet.ra * (Math.PI / 180);
+         const distanceUnits = exoplanet.distance * 0.1;
+         const x = distanceUnits * Math.cos(raRadians);
+         const y = distanceUnits * Math.sin(raRadians);
+         const z = 0;
+         
+         // Create a marker and line
+         const markerGeometry = new THREE.SphereGeometry(0.05, 16, 16);
+         const markerMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+         const marker = new THREE.Mesh(markerGeometry, markerMaterial);
+         marker.position.set(x, y, z);
+         scene.add(marker);
+         
+         const lineGeometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(x, y, z)]);
+         const lineMaterial = new THREE.LineBasicMaterial({ color: 0xffffff }); // Set line color
+         const line = new THREE.Line(lineGeometry, lineMaterial);
+         scene.add(line);
+         
+         // Create text labels
+         const createLabel = (text, position, color) => {
+             const loader = new THREE.FontLoader();
+             loader.load('https://threejs.org/examples/fonts/helvetiker_bold.typeface.json', (font) => {
+                 const geometry = new THREE.TextGeometry(text, {
+                     font: font,
+                     size: 0.6,
+                     height: 0.02
+                 });
+                 const material = new THREE.MeshBasicMaterial({ color: color });
+                 const label = new THREE.Mesh(geometry, material);
+         
+                 // Position the label above the globe and rotate to face the camera
+                 label.position.copy(position);
+                 label.position.y += 1.5; // Adjust the vertical position
+                 label.rotation.setFromRotationMatrix(camera.matrix);
+         
+                 scene.add(label);
+             });
+         };
+         
+         // Create labels for Name, RA, and distance
+         createLabel(`Name: ${exoplanet.name}`, new THREE.Vector3(0, 1.5, 0), 0xffffff);
+         createLabel(`RA: ${exoplanet.ra.toFixed(2)}°`, new THREE.Vector3(x, y, z), 0xffffff);
+         createLabel(`Distance: ${exoplanet.distance.toFixed(2)} light years`, new THREE.Vector3(x, y, z).add(new THREE.Vector3(0, -1.5, 0)), 0xffffff);
+         
+         // Set camera position and look at the marker
+         camera.position.y =-2.22;
+         camera.position.z =6;
+         camera.lookAt(marker.position);
+         
+         // Render the scene
+         const animate = () => {
+             requestAnimationFrame(animate);
+             renderer.render(scene, camera);
+         };
+         animate();
+      </script>
+   </body>
+</html>
