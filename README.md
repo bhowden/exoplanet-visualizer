@@ -74,5 +74,3 @@ Contributions are welcome! If you find a bug or have an enhancement, feel free t
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 ```
-
-Replace `yourusername` with your GitHub username, and make sure to adjust any details and URLs as needed. You can also add more sections or details to the `README.md` file as your project evolves.
