@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: exoplanet-visualizer-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: exoplanet-visualizer
+  template:
+    metadata:
+      labels:
+        app: exoplanet-visualizer
+    spec:
+      containers:
+        - name: exoplanet-visualizer
+          image: exoplanet-visualizer:latest
+          ports:
+            - containerPort: 3000
